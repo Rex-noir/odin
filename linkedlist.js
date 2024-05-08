@@ -5,8 +5,8 @@ export class LinkedList {
     this.index = 0;
   }
 
-  append(value) {
-    const newNode = new Node(value);
+  append(key, value) {
+    const newNode = new Node(key, value);
     if (!this.head) {
       this.head = newNode;
       this.tail = newNode;
@@ -18,8 +18,8 @@ export class LinkedList {
     this.index++;
   }
 
-  prepend(value) {
-    const newNode = new Node(value);
+  prepend(key, value) {
+    const newNode = new Node(key, value);
     if (!this.head) {
       this.head = newNode;
       this.tail = newNode;
@@ -35,20 +35,20 @@ export class LinkedList {
   }
 
   getHead() {
-    return this.head.value;
+    return this.head.key;
   }
 
   getTail() {
-    return this.tail.value;
+    return this.tail.key;
   }
 
   at(index) {
     let temp = this.head;
     for (let i = 0; i < index; i++) {
       temp = temp.nextNode;
-      if (!temp) return "Invalid Index";
+      if (!temp) return false;
     }
-    return temp.value;
+    return temp;
   }
 
   pop() {
@@ -57,27 +57,27 @@ export class LinkedList {
     this.index--;
   }
 
-  contains(value) {
+  contains(key) {
     let temp = this.head;
     for (let i = 0; i <= this.index; i++) {
       if (!temp) return false;
-      if (temp.value == value) return true;
+      if (temp._key == key) return true;
       temp = temp.nextNode;
     }
     return false;
   }
 
-  find(value) {
+  find(key) {
     let temp = this.head;
     let index = 0;
     while (temp) {
-      if (temp.value === value) {
+      if (temp._key === key) {
         return index;
       }
       index++;
       temp = temp.nextNode;
     }
-    return "Not found!";
+    return false;
   }
 
   toString() {
@@ -89,7 +89,7 @@ export class LinkedList {
         result.push("(null)");
       }
       if (temp) {
-        result.push(`( ${temp.value} ) ->`);
+        result.push(`( ${temp._key} ) ->`);
         temp = temp.nextNode;
       }
     }
@@ -100,19 +100,19 @@ export class LinkedList {
     return result.join(" ");
   }
 
-  insertAt(value, index) {
+  insertAt(key, value, index) {
     let temp = this.head;
     if (index > this.index || index < 0) {
       this.append(value);
       return;
     }
     if (index == 0) {
-      this.prepend(value);
+      this.prepend(key, value);
       return;
     }
     for (let i = 0; i <= this.index; i++) {
       if (i == index) {
-        const node = new Node(value);
+        const node = new Node(key, value);
         node.prevNode = temp.prevNode;
         node.nextNode = temp;
         temp.prevNode.nextNode = node;
@@ -125,27 +125,45 @@ export class LinkedList {
   }
   removeAt(index) {
     let temp = this.head;
-
-    for (let i = 0; i < this.index; i++) {
-      if (i == index) {
-        if (!temp.nextNode) {
-          this.tail = temp;
-        } else {
-          temp.nextNode.prevNode = temp.prevNode;
-        }
-        temp.prevNode.nextNode = temp.nextNode;
-        this.index--;
-        return;
-      }
-      if (!temp) return "Invalid index";
+    if (index < 0 || index >= this.size()) {
+      throw new Error("Invalid index");
+    }
+    for (let i = 0; i < index; i++) {
       temp = temp.nextNode;
     }
+    temp._key = null;
+    temp._value = null;
+    if (!temp.nextNode) {
+      this.tail = temp;
+    } else {
+      temp.nextNode.prevNode = temp.prevNode;
+    }
+    if (!temp.prevNode) {
+      this.head = temp;
+    } else {
+      temp.prevNode.nextNode = temp.nextNode;
+    }
+    this.index -= 1;
+    return;
   }
 }
 class Node {
-  constructor(value = null) {
-    this.value = value;
+  constructor(key, value = null) {
+    this._key = key;
+    this._value = value;
     this.nextNode = null;
     this.prevNode = null;
+  }
+  setKey(key) {
+    this._key = key;
+  }
+  getValue() {
+    return this._value;
+  }
+  getKey() {
+    return this._key;
+  }
+  setValue(value) {
+    this._value = value;
   }
 }
